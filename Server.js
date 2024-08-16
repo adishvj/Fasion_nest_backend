@@ -5,6 +5,7 @@ const productsRoutes = require("./Routes/product_routes");
 const StaffRoutes = require("./Routes/staffRouts");
 const authRouter = require("./Routes/auth_router");
 const cartRouter = require("./Routes/cart_routes"); // Import cart routes
+const wishRouter = require("./Routes/wishRouter");
 require('dotenv').config();//for working .env
 mongoose.connect(process.env.MONGODB_URI).then(() => {
     console.log("database connected")
@@ -21,7 +22,8 @@ app.use(express.urlencoded({ extended: true }))
 app.use("/api/product", productsRoutes)
 app.use("/api/staff", StaffRoutes)
 app.use("/api/auth/",authRouter)
-app.use("/api/cart", cartRouter); // Use cart routes
+app.use("/api/cart", cartRouter); 
+app.use('/api/wish',wishRouter);// Use cart routes
 
 
 

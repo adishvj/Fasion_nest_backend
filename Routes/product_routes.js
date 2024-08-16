@@ -86,41 +86,117 @@ productsRoutes.get('/viewProduct',uploadImage.single("image"), async (req, res) 
     });
 });
 
-productsRoutes.put('/updateProduct/:id', async (req, res) => {
-  try {
+// productsRoutes.put('/updateProduct/:id', async (req, res) => {
+//   try {
 
-    const oldData = await productDB.findOne({ _id: req.params.id })
-    console.log(oldData);
+//     const oldData = await productDB.findOne({ _id: req.params.id })
+//     console.log(oldData);
+//     const Data = {
+//       title: req.body.title ? req.body.title : oldData.title,
+//       price: req.body.price ? req.body.price : oldData.price,
+//       description: req.body.description ? req.body.description : oldData.description,
+//       review: req.body.review ? req.body.review : oldData.review,
+//       seller: req.body.seller ? req.body.seller : oldData.seller,
+//       category: req.body.category ? req.body.category : oldData.category,
+//       rate: req.body.rate ? req.body.rate : oldData.rate,
+//       quandity: req.body.quandity ? req.body.quandity : oldData.quandity,
+//       image: req.file ? req.file.path : oldData.image
+
+//     }
+//     console.log("Dataaa.....", Data);
+
+//     const updateData = await productDB.updateOne({ _id: req.params.id }, { $set: Data })
+//     console.log(updateData);
+
+//     if (updateData.modifiedCount == 1) {
+//       return res.status(200).json({
+//         Success: true,
+//         Error: false,
+//         Message: 'Data updated successfully',
+//         data: updateData,
+//       });
+
+//     } else if (updateData.modifiedCount == 0) {
+//       return res.status(200).json({
+//         Success: true,
+//         Error: false,
+//         Message: 'Data already updated ',
+//         data: updateData,
+//       });
+//     }
+
+//     else {
+//       return res.status(400).json({
+//         Error: true,
+//         Success: false,
+//         Message: 'Error, Data not updated',
+//       });
+//     }
+//   } catch (error) {
+//     console.log(error)
+//     return res.status(500).json({
+//       Error: true,
+//       Success: false,
+//       Message: 'Internal server error',
+//       ErrorMessage: error,
+//     });
+//   }
+// })
+
+productsRoutes.put('/updateProduct/:id', uploadImage.single('image'), async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Find the old data
+    const oldData = await productDB.findOne({ _id: id });
+    if (!oldData) {
+      return res.status(404).json({
+        Success: false,
+        Error: true,
+        Message: 'Product not found',
+      });
+    }
+
+    // Log the old data and incoming request body
+    console.log('Old Data:', oldData);
+    console.log('Request Body:', req.body);
+
+    // Construct the update data
     const Data = {
-      name: req.body.name ? req.body.name : oldData.name,
+      title: req.body.title ? req.body.title : oldData.title,
       price: req.body.price ? req.body.price : oldData.price,
       description: req.body.description ? req.body.description : oldData.description,
-      image: req.file ? req.file.path : oldData.image
+      review: req.body.review ? req.body.review : oldData.review,
+      seller: req.body.seller ? req.body.seller : oldData.seller,
+      category: req.body.category ? req.body.category : oldData.category,
+      rate: req.body.rate ? req.body.rate : oldData.rate,
+      quantity: req.body.quantity ? req.body.quantity : oldData.quantity,
+      image: req.file ? req.file.path : oldData.image,
+    };
 
-    }
-    console.log("Dataaa.....", Data);
+    // Log the data to be updated
+    console.log('Data to Update:', Data);
 
-    const updateData = await productDB.updateOne({ _id: req.params.id }, { $set: Data })
-    console.log(updateData);
+    // Perform the update operation
+    const updateData = await productDB.updateOne({ _id: id }, { $set: Data });
+    console.log('Update Result:', updateData);
 
-    if (updateData.modifiedCount == 1) {
+    // Check if the update was successful
+    if (updateData.modifiedCount === 1) {
       return res.status(200).json({
         Success: true,
         Error: false,
         Message: 'Data updated successfully',
         data: updateData,
       });
-
-    } else if (updateData.modifiedCount == 0) {
+    } else if (updateData.modifiedCount === 0) {
       return res.status(200).json({
         Success: true,
         Error: false,
-        Message: 'Data already updated ',
+        Message: 'No changes made to the data',
         data: updateData,
       });
-    }
-
-    else {
+    } else {
       return res.status(400).json({
         Error: true,
         Success: false,
@@ -128,7 +204,7 @@ productsRoutes.put('/updateProduct/:id', async (req, res) => {
       });
     }
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return res.status(500).json({
       Error: true,
       Success: false,
@@ -136,7 +212,13 @@ productsRoutes.put('/updateProduct/:id', async (req, res) => {
       ErrorMessage: error,
     });
   }
-})
+});
+
+
+
+
+
+
 productsRoutes.delete('/deleteProduct/:id', async (req, res) => {
   try {
     const result = await productDB.deleteOne({ _id: req.params.id });
